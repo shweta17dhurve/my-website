@@ -1,13 +1,43 @@
-// ---------- SEARCH FUNCTION ----------
+// GLOBAL DATA
+let drugData = [];
+
+// ================= LOAD CSV =================
+async function loadCSV() {
+  let response = await fetch("data/drugs.csv");
+  let text = await response.text();
+
+  let rows = text.split("\n").slice(1);
+
+  drugData = rows.map(row => {
+    let cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+
+    return {
+      name: cols[2],
+      class: cols[3],
+      disease: cols[1],
+      gene: cols[4],
+      gene_full: cols[5],
+      clinical: cols[6],
+      response: cols[7],
+      mechanism: cols[8],
+      reference: cols[10]
+    };
+  }).filter(d => d.name);
+
+  console.log("Total drugs loaded:", drugData.length);
+}
+
+// ================= SEARCH =================
 function searchDrug(event) {
   event.preventDefault();
 
-  let query = document.getElementById("searchInput").value.toLowerCase();
+  let query = document.getElementById("searchInput").value.toLowerCase().trim();
 
-  let found = drugData.find(d => d.name.toLowerCase() === query);
+  let found = drugData.find(d =>
+    d.name.toLowerCase().includes(query)
+  );
 
   if (found) {
-    // Redirect to details page
     window.location.href = "drug-details.html?drug=" + found.name;
   } else {
     let box = document.getElementById("messageBox");
@@ -16,54 +46,14 @@ function searchDrug(event) {
   }
 }
 
-
-// ---------- LOAD DRUG DETAILS ----------
-function loadDrugDetails() {
-  const params = new URLSearchParams(window.location.search);
-  const drugName = params.get("drug");
-
-  if (!drugName) return;
-
-  const drug = drugData.find(d => d.name === drugName);
-
-  if (!drug) return;
-
-  // Fill values
-  document.getElementById("drug").innerText = drug.name;
-  document.getElementById("drug_title").innerText = drug.name + " Pharmacogenomic Profile";
-  document.getElementById("drug_class").innerText = drug.class;
-  document.getElementById("disease").innerText = drug.disease;
-  document.getElementById("gene").innerText = drug.gene;
-  document.getElementById("gene_full").innerText = drug.gene_full;
-  document.getElementById("clinical").innerText = drug.clinical;
-  document.getElementById("response").innerText = drug.response;
-  document.getElementById("mechanism").innerText = drug.mechanism;
-  document.getElementById("reference").innerText = drug.reference;
-
-  // Image
-  document.getElementById("drug_img").src =
-    "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/" + drug.name + "/PNG";
-
-  // Links
-  document.getElementById("pubmed_link").href =
-    "https://pubmed.ncbi.nlm.nih.gov/?term=" + drug.name;
-
-  document.getElementById("gene_link").href =
-    "https://www.ncbi.nlm.nih.gov/gene/?term=" + drug.gene;
-
-  document.getElementById("drugbank_link").href =
-    "https://go.drugbank.com/unearth/q?searcher=drugs&query=" + drug.name;
-}
-
-
-// ---------- LOAD DRUG LIST ----------
+// ================= DRUG LIST =================
 function loadDrugList() {
   const list = document.getElementById("drugList");
   if (!list) return;
 
   drugData.forEach(drug => {
     let btn = document.createElement("button");
-    btn.className = "list-group-item list-group-item-action text-start";
+    btn.className = "list-group-item list-group-item-action";
     btn.innerText = drug.name;
 
     btn.onclick = () => {
@@ -74,56 +64,47 @@ function loadDrugList() {
   });
 }
 
+// ================= DRUG DETAILS =================
+function loadDrugDetails() {
+  const params = new URLSearchParams(window.location.search);
+  const drugName = params.get("drug");
 
-// ---------- LOAD GENE LIST ----------
-function loadGeneList() {
-  const list = document.getElementById("geneList");
-  if (!list) return;
+  if (!drugName) return;
 
-  geneData.forEach(gene => {
-    let li = document.createElement("li");
-    li.className = "list-group-item";
-    li.innerText = gene;
-    list.appendChild(li);
-  });
+  const drug = drugData.find(d => d.name === drugName);
+  if (!drug) return;
+
+  document.getElementById("drug").innerText = drug.name;
+  document.getElementById("drug_class").innerText = drug.class;
+  document.getElementById("disease").innerText = drug.disease;
+  document.getElementById("gene").innerText = drug.gene;
+  document.getElementById("gene_full").innerText = drug.gene_full;
+  document.getElementById("clinical").innerText = drug.clinical;
+  document.getElementById("response").innerText = drug.response;
+  document.getElementById("mechanism").innerText = drug.mechanism;
+  document.getElementById("reference").innerText = drug.reference;
+
+  document.getElementById("drug_img").src =
+    "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/" + drug.name + "/PNG";
 }
 
-
-// ---------- LOAD PAPERS ----------
-function loadPapers() {
-  const tbody = document.querySelector("#papersTable tbody");
-  if (!tbody) return;
-
-  papersData.forEach(p => {
-    let row = `
-      <tr>
-        <td>${p.title}</td>
-        <td>${p.author}</td>
-        <td>${p.year}</td>
-        <td><a href="${p.link}" target="_blank">View</a></td>
-      </tr>
-    `;
-    tbody.innerHTML += row;
-  });
-}
-
-
-// ---------- DASHBOARD ----------
+// ================= DASHBOARD =================
 function loadDashboard() {
   if (document.getElementById("total_genes")) {
-    document.getElementById("total_genes").innerText = geneData.length;
+    let genes = [...new Set(drugData.map(d => d.gene))];
+
+    document.getElementById("total_genes").innerText = genes.length;
     document.getElementById("total_drugs").innerText = drugData.length;
     document.getElementById("total_interactions").innerText =
-      geneData.length * drugData.length;
+      genes.length * drugData.length;
   }
 }
 
-
-// ---------- AUTO RUN ----------
+// ================= AUTO RUN =================
 window.onload = function () {
-  loadDrugDetails();
-  loadDrugList();
-  loadGeneList();
-  loadPapers();
-  loadDashboard();
+  loadCSV().then(() => {
+    loadDrugList();
+    loadDrugDetails();
+    loadDashboard();
+  });
 };
