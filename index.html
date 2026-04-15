@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8"> <!-- ✅ FIX: encoding -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ mobile fix -->
+
   <title>Pharmacogenomics Portal</title>
 
-  <!-- ✅ FIX: link CSS (your UI was not loading because of this) -->
-  <link rel="stylesheet" href="style.css">
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
@@ -14,17 +17,23 @@
 <h2>Search</h2>
 
 <form onsubmit="searchDrug(event)">
-  <input type="text" id="searchInput" placeholder="Enter drug name" required>
+  <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="Enter drug name" 
+    required
+  >
   <button type="submit">Search</button>
 </form>
 
 <div id="messageBox" style="color:red;"></div>
 
 <br>
+
 <a href="./drugs.html">View All Drugs</a> |
 <a href="./dashboard.html">Dashboard</a>
 
-<!-- ✅ FIX: ensure correct script path -->
+<!-- ✅ JS -->
 <script src="./script.js"></script>
 
 </body>
