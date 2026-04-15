@@ -5,7 +5,7 @@ let drugData = [];
 // ================= LOAD CSV =================
 async function loadCSV() {
   try {
-    let response = await fetch("./data.csv"); // ✅ FIXED PATH
+    let response = await fetch("./data.csv"); // ✅ correct path
     let text = await response.text();
 
     let rows = text.split("\n").slice(1);
@@ -13,18 +13,21 @@ async function loadCSV() {
     drugData = rows.map(row => {
       let cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
+      // ✅ Skip invalid rows
+      if (cols.length < 11) return null;
+
       return {
-        name: cols[2],
-        class: cols[3],
-        disease: cols[1],
-        gene: cols[4],
-        gene_full: cols[5],
-        clinical: cols[6],
-        response: cols[7],
-        mechanism: cols[8],
-        reference: cols[10]
+        name: cols[2]?.trim(),
+        class: cols[3]?.trim(),
+        disease: cols[1]?.trim(),
+        gene: cols[4]?.trim(),
+        gene_full: cols[5]?.trim(),
+        clinical: cols[6]?.trim(),
+        response: cols[7]?.trim(),
+        mechanism: cols[8]?.trim(),
+        reference: cols[10]?.trim()
       };
-    }).filter(d => d.name);
+    }).filter(d => d && d.name);
 
     console.log("✅ Total drugs loaded:", drugData.length);
 
@@ -45,7 +48,8 @@ window.searchDrug = function(event) {
   );
 
   if (found) {
-    window.location.href = "./drugs.html?drug=" + encodeURIComponent(found.name); // ✅ FIXED
+    // ✅ correct redirect
+    window.location.href = "./drugs.html?drug=" + encodeURIComponent(found.name);
   } else {
     let box = document.getElementById("messageBox");
     if (box) {
@@ -69,7 +73,8 @@ function loadDrugList() {
     btn.innerText = drug.name;
 
     btn.onclick = () => {
-      window.location.href = "./drug.html?drug=" + encodeURIComponent(drug.name); // ✅ FIXED PAGE NAME
+      // ✅ correct page
+      window.location.href = "./drug.html?drug=" + encodeURIComponent(drug.name);
     };
 
     list.appendChild(btn);
@@ -84,7 +89,11 @@ function loadDrugDetails() {
 
   if (!drugName) return;
 
-  const drug = drugData.find(d => d.name === drugName);
+  // ✅ FIXED: case-insensitive + decode
+  const drug = drugData.find(d =>
+    d.name.toLowerCase() === decodeURIComponent(drugName).toLowerCase()
+  );
+
   if (!drug) return;
 
   if (document.getElementById("drug"))
@@ -114,10 +123,11 @@ function loadDrugDetails() {
   if (document.getElementById("reference"))
     document.getElementById("reference").innerText = drug.reference;
 
+  // ✅ Drug image from PubChem
   if (document.getElementById("drug_img")) {
     document.getElementById("drug_img").src =
       "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/" +
-      drug.name +
+      encodeURIComponent(drug.name) +
       "/PNG";
   }
 }
