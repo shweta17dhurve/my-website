@@ -35,7 +35,7 @@ async function loadCSV() {
 
 
 // ================= SEARCH =================
-function searchDrug(event) {
+window.searchDrug = function(event) {
   event.preventDefault();
 
   let query = document.getElementById("searchInput").value.toLowerCase().trim();
