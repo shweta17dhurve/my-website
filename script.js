@@ -5,7 +5,7 @@ let drugData = [];
 // ================= LOAD CSV =================
 async function loadCSV() {
   try {
-    let response = await fetch("./data.csv"); // ✅ correct path
+    let response = await fetch("./data.csv");
     let text = await response.text();
 
     let rows = text.split("\n").slice(1);
@@ -13,7 +13,6 @@ async function loadCSV() {
     drugData = rows.map(row => {
       let cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
-      // ✅ Skip invalid rows
       if (cols.length < 11) return null;
 
       return {
@@ -41,14 +40,16 @@ async function loadCSV() {
 window.searchDrug = function(event) {
   event.preventDefault();
 
-  let query = document.getElementById("searchInput").value.toLowerCase().trim();
+  let input = document.getElementById("searchInput");
+  if (!input) return;
+
+  let query = input.value.toLowerCase().trim();
 
   let found = drugData.find(d =>
     d.name.toLowerCase().includes(query)
   );
 
   if (found) {
-    // ✅ correct redirect
     window.location.href = "./drugs.html?drug=" + encodeURIComponent(found.name);
   } else {
     let box = document.getElementById("messageBox");
@@ -73,7 +74,6 @@ function loadDrugList() {
     btn.innerText = drug.name;
 
     btn.onclick = () => {
-      // ✅ correct page
       window.location.href = "./drug.html?drug=" + encodeURIComponent(drug.name);
     };
 
@@ -89,12 +89,16 @@ function loadDrugDetails() {
 
   if (!drugName) return;
 
-  // ✅ FIXED: case-insensitive + decode
+  const decodedName = decodeURIComponent(drugName);
+
   const drug = drugData.find(d =>
-    d.name.toLowerCase() === decodeURIComponent(drugName).toLowerCase()
+    d.name.toLowerCase() === decodedName.toLowerCase()
   );
 
-  if (!drug) return;
+  if (!drug) {
+    console.warn("❌ Drug not found in CSV:", decodedName);
+    return;
+  }
 
   if (document.getElementById("drug"))
     document.getElementById("drug").innerText = drug.name;
@@ -123,12 +127,16 @@ function loadDrugDetails() {
   if (document.getElementById("reference"))
     document.getElementById("reference").innerText = drug.reference;
 
-  // ✅ Drug image from PubChem
   if (document.getElementById("drug_img")) {
     document.getElementById("drug_img").src =
       "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/" +
       encodeURIComponent(drug.name) +
       "/PNG";
+  }
+
+  // ✅ IMPORTANT: extra UI details
+  if (typeof fillExtraDetails === "function") {
+    fillExtraDetails(drug);
   }
 }
 
