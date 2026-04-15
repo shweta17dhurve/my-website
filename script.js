@@ -45,7 +45,7 @@ window.searchDrug = function(event) {
   );
 
   if (found) {
-    window.location.href = "drug-details.html?drug=" + found.name;
+    window.location.href = "drugs.html?drug=" + encodeURIComponent(input);
   } else {
     let box = document.getElementById("messageBox");
     if (box) {
