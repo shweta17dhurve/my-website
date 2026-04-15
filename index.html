@@ -1,39 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8"> <!-- ✅ FIX: encoding -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ mobile fix -->
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pharmacogenomics Portal</title>
 
-  <!-- ✅ CSS -->
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
 
-<h1>Pharmacogenomics Portal</h1>
+<!-- ✅ APPLY HEADER STYLE -->
+<div class="top-header">
+  <h1>Pharmacogenomics Portal</h1>
+</div>
 
-<h2>Search</h2>
+<!-- ✅ APPLY NAVBAR STYLE -->
+<div class="navbar">
+  <a href="./index.html">Home</a>
+  <a href="./drugs.html">View All Drugs</a>
+  <a href="./dashboard.html">Dashboard</a>
+</div>
 
-<form onsubmit="searchDrug(event)">
-  <input 
-    type="text" 
-    id="searchInput" 
-    placeholder="Enter drug name" 
-    required
-  >
-  <button type="submit">Search</button>
-</form>
+<!-- ✅ APPLY CONTAINER -->
+<div class="container">
 
-<div id="messageBox" style="color:red;"></div>
+  <h2>Search</h2>
 
-<br>
+  <!-- ✅ APPLY PANEL -->
+  <div class="panel">
+    <form onsubmit="searchDrug(event)">
+      <input type="text" id="searchInput" placeholder="Enter drug name" required>
+      <button type="submit">Search</button>
+    </form>
 
-<a href="./drugs.html">View All Drugs</a> |
-<a href="./dashboard.html">Dashboard</a>
+    <div id="messageBox" style="color:red;"></div>
+  </div>
 
-<!-- ✅ JS -->
+</div>
+
+<!-- ✅ FOOTER -->
+<footer>
+  <p>© 2026 Pharmacogenomics Portal</p>
+</footer>
+
 <script src="./script.js"></script>
 
 </body>
