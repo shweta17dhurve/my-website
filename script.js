@@ -5,26 +5,26 @@ let drugData = [];
 // ================= LOAD CSV =================
 async function loadCSV() {
   try {
-    let response = await fetch("data/drugs.csv");
+    let response = await fetch("./data.csv"); // ✅ FIXED PATH
     let text = await response.text();
 
-    let rows = text.split("\n").slice(1); // remove header
+    let rows = text.split("\n").slice(1);
 
     drugData = rows.map(row => {
       let cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
       return {
-        name: cols[2],        // Drug Name
-        class: cols[3],       // Drug Class
-        disease: cols[1],     // Disease
-        gene: cols[4],        // Target Gene
-        gene_full: cols[5],   // Gene Full Name
-        clinical: cols[6],    // Clinical Significance
-        response: cols[7],    // Drug Response
-        mechanism: cols[8],   // Mechanism
-        reference: cols[10]   // Reference
+        name: cols[2],
+        class: cols[3],
+        disease: cols[1],
+        gene: cols[4],
+        gene_full: cols[5],
+        clinical: cols[6],
+        response: cols[7],
+        mechanism: cols[8],
+        reference: cols[10]
       };
-    }).filter(d => d.name); // remove empty rows
+    }).filter(d => d.name);
 
     console.log("✅ Total drugs loaded:", drugData.length);
 
@@ -45,7 +45,7 @@ window.searchDrug = function(event) {
   );
 
   if (found) {
-    window.location.href = "drugs.html?drug=" + encodeURIComponent(input);
+    window.location.href = "./drugs.html?drug=" + encodeURIComponent(found.name); // ✅ FIXED
   } else {
     let box = document.getElementById("messageBox");
     if (box) {
@@ -69,7 +69,7 @@ function loadDrugList() {
     btn.innerText = drug.name;
 
     btn.onclick = () => {
-      window.location.href = "drug-details.html?drug=" + drug.name;
+      window.location.href = "./drug.html?drug=" + encodeURIComponent(drug.name); // ✅ FIXED PAGE NAME
     };
 
     list.appendChild(btn);
@@ -87,7 +87,6 @@ function loadDrugDetails() {
   const drug = drugData.find(d => d.name === drugName);
   if (!drug) return;
 
-  // Fill data safely
   if (document.getElementById("drug"))
     document.getElementById("drug").innerText = drug.name;
 
